@@ -1,7 +1,7 @@
 language: python
 python:
-  - "2.7"
+ - "2.7"
 before_install:
  - bundle install
-install: "pip install pyaml flake8 pylint"
+install: "pip install flake8 pylint"
 script: "rake"
