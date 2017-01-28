@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/funkwerk/confluence-python-cli.svg)](https://travis-ci.org/funkwerk/confluence-python-cli)
+[![PyPi downloads](https://img.shields.io/pypi/dm/confluence_python_cli.svg)](https://pypi.python.org/pypi/confluence_python_cli/)
+[![PyPi version](https://img.shields.io/pypi/v/confluence_python_cli.svg)](https://pypi.python.org/pypi/confluence_python_cli/)
+
 # Confluence.py
 
 Simple python script to use a Atlassian Confluence Wiki via the CLI.
