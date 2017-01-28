@@ -57,6 +57,16 @@ class ConfluenceSpace(object):
         self.spacekey = spaceKey
         return self.server.confluence2.getPages(self.token, self.spacekey)
 
+    def pages_by_label(self, label):
+        return self.server.confluence2.getLabelContentByName(self.token, label)
+
+    def get_attachments(self, page):
+        return self.server.confluence2.getAttachments(self.token, page)
+
+    def get_attachment(self, page, name, version):
+        return self.server.confluence2.getAttachmentData(self.token, page, name, version)
+
+
 class ConfluenceGroup(object):
     def __init__(self,token,server,groupname):
         self.server = server
@@ -143,9 +153,9 @@ class ConfluencePage(object):
         return {"url": self.page_url, "id": self.page_id}
 
     def update(self,content,parent_id=0):
-        self.remove()
-        self.parent_id = parent_id
-        self.add(str(parent_id),content)
+        page = self.server.confluence2.getPage(self.token, self.spaceKey, self.name)
+        page["content"] = content
+        self.server.confluence2.storePage(self.token, page)
 
     def get(self):
         self.wanted_page = self.server.confluence2.getPage(self.token, self.spaceKey, self.name)
@@ -163,6 +173,9 @@ class ConfluencePage(object):
 
     def get_content(self):
         return self.get()['content']
+
+    def get_source(self):
+        return self.get()
 
     def remove(self):
         self.page = self.server.confluence2.getPage(self.token, self.spaceKey, self.name)
@@ -242,10 +255,22 @@ def Parser():
     parser_getpage.add_argument("-n", "--name", help="Page name", required=True)
     parser_getpage.add_argument("-s", "--spacekey", help="Space Key", required=True)
 
+    parser_getpage_source = subparsers.add_parser('getpagesource', help='Get page source')
+    parser_getpage_source.add_argument("-n", "--name", help="Page name", required=True)
+    parser_getpage_source.add_argument("-s", "--spacekey", help="Space Key", required=True)
+
     parser_getpagesummary = subparsers.add_parser('getpagesummary', help='Get page summary')
     parser_getpagesummary.add_argument("-s", "--spacekey", help="Space Key", required=True)
     parser_getpagesummary.add_argument("-n", "--name", help="Page name", required=True)
     parser_getpagesummary.add_argument("-d", "--delimiter", help="Field delimiter", default=", ")
+
+    parser_getattachments = subparsers.add_parser('getattachments', help='Get Attachments for a Page')
+    parser_getattachments.add_argument("-i", "--id", help="Page id", required=True)
+
+    parser_getattachment = subparsers.add_parser('getattachment', help='Download Attachment for a Page')
+    parser_getattachment.add_argument("-i", "--id", help="Page id", required=True)
+    parser_getattachment.add_argument("-f", "--file", help="File Name", required=True)
+    parser_getattachment.add_argument("-v", "--version", help="Version", required=True)
 
     parser_listspaces = subparsers.add_parser('listspaces', help='List all spaces')
 
@@ -298,6 +323,9 @@ def Parser():
     parser_listusergroups = subparsers.add_parser('listusergroups', help='List groups user is in')
     parser_listusergroups.add_argument("-U", "--newusername", help="Username to perform action on.", required=True)
 
+    parser_pagesbylabel = subparsers.add_parser('pagesbylabel', help='Pages by Label')
+    parser_pagesbylabel.add_argument("-l", "--label", help="Label to filter by.", required=True)
+
     args = parser.parse_args()
     return args
 
@@ -340,6 +368,7 @@ def Actions(token,xml_server,args,content):
                 token,xml_server,args.name,args.spacekey,content,label=args.label)
             copy_page.add(args.parentpage)
             print(copy_page.get()["url"])
+
         elif args.action == "updatepage":
             update_page = ConfluencePage(token,xml_server,args.name,args.spacekey,content,args.parentpage,label=args.label)
             update_page.update(content,args.parentpage)
@@ -348,7 +377,10 @@ def Actions(token,xml_server,args,content):
 
         elif args.action == "getpagecontent":
             get_page = ConfluencePage(token,xml_server,args.name,args.spacekey,content).get_content()
-            print(get_page)
+            print(get_page.encode('utf-8'))
+        elif args.action == "getpagesource":
+            get_page = ConfluencePage(token,xml_server,args.name,args.spacekey,content).get_source()
+            print(get_page['content'].encode('utf-8'))
 
         elif args.action == "getpagesummary":
             page = ConfluencePage(token,xml_server,args.name,args.spacekey,content).get()
@@ -400,6 +432,16 @@ def Actions(token,xml_server,args,content):
                         except IOError:
                             error_out('Could not write file: %s' % page['title'])
 
+        elif args.action == "getattachments":
+            space = ConfluenceSpace(token,xml_server)
+
+            print(space.get_attachments(args.id))
+
+        elif args.action == "getattachment":
+            space = ConfluenceSpace(token,xml_server)
+
+            print(space.get_attachment(args.id, args.file, args.version))
+
         elif args.action == "adduser":
             add_user = ConfluenceUser(token,xml_server,args.newusername).create(args.fullname,args.email,args.userpassword)
 
@@ -446,6 +488,15 @@ def Actions(token,xml_server,args,content):
             user_groups = ConfluenceUser(token,xml_server,args.newusername).get_groups()
             for group in user_groups:
                 print(group)
+
+        elif args.action == "pagesbylabel":
+            all_spaces = ConfluenceSpace(token,xml_server).get_all()
+
+            for page in ConfluenceSpace(token,xml_server).pages_by_label(args.label):
+                try:
+                    print('{0}.{1}'.format(page['url'].split('/')[4].decode('utf-8'), page['title'].decode('utf-8')))
+                except:
+                    pass  # TODO: Pages with unicode should work as well!
 
     except xmlrpclib.Fault as err:
         print(("Error: %d: %s") % (err.faultCode, err.faultString))
