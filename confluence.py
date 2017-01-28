@@ -161,18 +161,8 @@ class ConfluencePage(object):
         self.wanted_page = self.server.confluence2.getPage(self.token, self.spaceKey, self.name)
         return self.wanted_page
 
-    def get_content(self):
-        self.wanted_page_id = self.get_page_id
-        self.content_values = {"style": "clean"}
-        self.page_content = self.wanted_page = self.server.confluence2.renderContet(self.token, self.wanted_page_id,self.content_values)
-        return self.page_content
-
-
     def get_id(self):
         return self.get()['id']
-
-    def get_content(self):
-        return self.get()['content']
 
     def get_source(self):
         return self.get()
@@ -384,8 +374,8 @@ def Actions(token,xml_server,args,content):
 
         elif args.action == "getpagesummary":
             page = ConfluencePage(token,xml_server,args.name,args.spacekey,content).get()
-            print args.delimiter.join((
-             page['id'], page['space'], page['parentId'], page['title'], page['url']))
+            print(args.delimiter.join([
+             page['id'], page['space'], page['parentId'], page['title'], page['url']]))
 
         elif args.action == "listpages":
             if args.spacekey == "":
@@ -395,8 +385,8 @@ def Actions(token,xml_server,args,content):
             for space in spaces:
                 all_pages = ConfluenceSpace(token,xml_server).get_all_pages(space['key'])
                 for page in all_pages:
-                    print args.delimiter.join((
-                     page['id'], page['space'], page['parentId'], page['title'], page['url']))
+                    print(args.delimiter.join((
+                     page['id'], page['space'], page['parentId'], page['title'], page['url'])))
 
         elif args.action == "removepage":
             removed_page = ConfluencePage(token,xml_server,args.name,args.spacekey,"").remove()

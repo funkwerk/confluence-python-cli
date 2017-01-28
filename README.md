@@ -1,24 +1,28 @@
 # Confluence.py
 
-Simple python script to use a Atlassian Confluence Wiki via the CLI. 
+Simple python script to use a Atlassian Confluence Wiki via the CLI.
 
 ## Usage
-    
-    $ python confluence.py --help                                                                                         
+
+    $ python confluence.py --help
     usage: confluence.py [-h] -w WIKIURL -u USERNAME -p PASSWORD
-                         {addpage,updatepage,listpages,removepage,getpagecontent,getpagesummary,listspaces,addspace,removespace,adduser,removeuser,deactivateuser,reactivateuser,changeuserpassword,addgroup,removegroup,listgroups,listusers,getallpages,addusertogroup,removeusergromgroup,listusergroups}
+                         {addpage,updatepage,copypage,listpages,removepage,getpagecontent,getpagesummary,getpagesource,getattachments,getattachment,listspaces,addspace,removespace,adduser,removeuser,deactivateuser,reactivateuser,changeuserpassword,addgroup,removegroup,listgroups,listusers,getallpages,addusertogroup,removeusergromgroup,listusergroups,pagesbylabel}
                          ...
-    
+
     Confluence wiki API
-    
+
     positional arguments:
-      {addpage,updatepage,listpages,removepage,getpagecontent,getpagesummary,listspaces,addspace,removespace,adduser,removeuser,deactivateuser,reactivateuser,changeuserpassword,addgroup,removegroup,listgroups,listusers,getallpages,addusertogroup,removeusergromgroup,listusergroups}
+      {addpage,updatepage,copypage,listpages,removepage,getpagecontent,getpagesummary,getpagesource,getattachments,getattachment,listspaces,addspace,removespace,adduser,removeuser,deactivateuser,reactivateuser,changeuserpassword,addgroup,removegroup,listgroups,listusers,getallpages,addusertogroup,removeusergromgroup,listusergroups,pagesbylabel}
         addpage             Add a page
+        copypage            Copies a page
         updatepage          Update a page
         listpages           List pages in one or all spaces
         removepage          Remove a page
         getpagecontent      Get page content
+        getpagesource       Get page source
         getpagesummary      Get page summary
+        getattachments      Get a list of all attachments
+        getattachment       Get a specific attachment
         listspaces          List all spaces
         addspace            Add a space
         removespace         Remove a space
@@ -36,7 +40,8 @@ Simple python script to use a Atlassian Confluence Wiki via the CLI.
         removeusergromgroup
                             Remove user from a group
         listusergroups      List groups user is in
-    
+        pagesbylabel        Pages by Label
+
     optional arguments:
       -h, --help            show this help message and exit
       -w WIKIURL, --wikiurl WIKIURL
@@ -109,4 +114,5 @@ For more actions, run `./confluence.py -h` or see the usage section above.
 
 ## More info
 
-[Raymii.org](https://raymii.org)
+ - Original Author: [Raymii.org](https://raymii.org)
+ - Updates: [Funkwerk](https://github.com/confluence-pyhton-cli)

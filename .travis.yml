@@ -1,9 +1,6 @@
 language: python
 python:
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.5-dev"
+  - "2.7"
 before_install:
  - bundle install
 install: "pip install pyaml flake8 pylint"
